@@ -4,8 +4,6 @@ import matplotlib.pyplot as plt
 from matplotlib.backends.backend_tkagg import FigureCanvasTkAgg
 import json
 
-# I wanted to rename this file to something else, but I started working on it, and now I'm too worried it will break something
-
 # Define MQTT broker parameters
 BROKER_HOST = "localhost"
 BROKER_PORT = 1883
@@ -24,7 +22,7 @@ class Subscriber:
         self.plot = plot
 
     # When the client successfully connects to the broker
-    # userdata and flags are not used, but I think they had to be added
+    # userdata and flags are not used
     def on_connect(self, client, userdata, flags, rc):
         # Originally used this for troubleshooting, we may not need it
         print("Connected to MQTT broker with result code " + str(rc))
@@ -32,7 +30,7 @@ class Subscriber:
 
     # Gets called when data is sent from the publisher (through the broker)
     # Once again userdata is not used
-    # Neither is client, but I have not changed it as I think it will break something
+    # Neither is client
     def on_message(self, client, userdata, msg):
         payload = json.loads(msg.payload.decode("utf-8"))
         self.temperature.append(payload["temperature"])
@@ -40,15 +38,11 @@ class Subscriber:
         self.update_plot()
 
     # Updating the plot with newly received data
-    # Only runs once data has been received, so the labels take a second or so to show up
-    # Temp and humidity are no long on the x and y-axis, instead they are both on the graph
-    # with time as the y-axis
-    # Lines never intersect because Temp can't go higher than 30 and humidity can't go lower than 40 (technically this doesn't make sense but it works for what we want)
-    # Humidity should be a percentage, but the best I could do was add a percentage sign on the label
+    # Only runs once data has been received, so the labels do not show up immediately
+    # Lines never intersect because Temp can't go higher than 30 and humidity can't go lower than 40
     def update_plot(self):
         self.plot.clear()
         # The legend changes location based on the graph (so it doesn't cover the graph)
-        # To be honest I have no idea why this works the way it does
         self.plot.plot(self.temperature, label="Temperature")
         self.plot.plot(self.humidity, label="Humidity (%)")
         self.plot.set_xlabel("Time (In Seconds)")
@@ -64,8 +58,7 @@ def create_plot(root, location):
     # fig for figure and ax for axes respectively
     fig, ax = plt.subplots()
     # I never set a window size so the plots would just make it as big as they need it
-    # This just happened to work out honestly
-    # As this way the window can be resized manually if need be (literally click and drag)
+    # As this way the window can be resized manually if need be
     canvas = FigureCanvasTkAgg(fig, master=root)
     # Allows the plots to sit together horizontally in the frame rather than vertically
     # Which would cause the window to be too long to display on screen
